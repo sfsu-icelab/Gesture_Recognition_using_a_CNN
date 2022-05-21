@@ -11,7 +11,7 @@ Program containing methods for interacting with the Neural Network
 import tensorflow as tf 
 import numpy as np
 
-def trainData(model, train_data, train_label, num_features, num_classes):    
+def trainData(model, train_data, train_label, num_classes, num_features=0):
     """
     Trains an empty model
 
@@ -23,19 +23,26 @@ def trainData(model, train_data, train_label, num_features, num_classes):
         Data used to train model
     train_label : Array
         Labels used to supervise training of the model
-    num_features : Integer
-        The total number of features that will go into the network.
     num_classes: Integer
         The number of possible outcomes for classification
+    num_features (Optional) : Integer
+        The total number of features that will go into the network.
 
     Returns
     -------
     model
         The trained Neural Network model
 
-    """    
+    """
     #Next Layers will utilize relu to activate the neuron
-    model.add(tf.keras.layers.Conv1D(8, kernel_size=3, activation=tf.nn.relu,padding='same'))
+    if num_features == 0:
+        # 2D layer containing 8 neural units
+        model.add(tf.keras.layers.Conv2D(8, kernel_size=(3, 3), activation='relu', input_shape=(8,8,1)))
+    else:
+        model.add(tf.keras.layers.Conv1D(8, kernel_size=3, activation=tf.nn.relu,padding='same'))
+    
+    #model.add(tf.keras.layer.MaxPooling2D(pool_size=(2, 2)))
+    # Flatten output for final layer
     model.add(tf.keras.layers.Flatten())
     #Final Layer produces 4 possible outputs representing each gesture
     #Softmax Function assigns each output a probability so all outputs sum to 1
@@ -48,13 +55,16 @@ def trainData(model, train_data, train_label, num_features, num_classes):
                   )
     
     train_label = np.array(train_label)
-    train_data = np.array(train_data).reshape(-1, num_features, 1)
+    if num_features == 0:
+        train_data = np.array(train_data)
+    else:
+        train_data = np.array(train_data).reshape(-1, num_features, 1)
     #Train Neural Net through 2 epochs
-    model.fit(train_data,train_label,epochs=2)
+    model.fit(train_data,train_label,epochs=5)
     
     return model
 
-def testData(model, test_data, test_label, num_features):
+def testData(model, test_data, test_label, num_features=0):
     """
     Evaluates a trained model
 
@@ -66,7 +76,7 @@ def testData(model, test_data, test_label, num_features):
         Data used to test model
     test_label : Array
         Labels used to quantitate accuracy of model
-    num_features : Integer
+    num_features (Optional) : Integer
         The total number of features that will go into the network.
     
 
@@ -79,7 +89,10 @@ def testData(model, test_data, test_label, num_features):
 
     """
     test_label = np.array(test_label)
-    test_data = np.array(test_data).reshape(-1, num_features, 1)
+    if num_features == 0:
+        test_data = np.array(test_data)
+    else:
+        test_data = np.array(test_data).reshape(-1, num_features, 1)
     loss, accuracy = model.evaluate(test_data,test_label)
     
     return loss, accuracy
