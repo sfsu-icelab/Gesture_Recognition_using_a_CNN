@@ -10,7 +10,7 @@ Program containing methods for retrieving data from dataset
 
 def dataset(fileAddress):
     """
-    Scans a .txt file for sEMG data and extracts features for each channel
+    Scans a .txt file for sEMG data
 
     Parameters
     ----------
@@ -20,7 +20,8 @@ def dataset(fileAddress):
 
     Returns
     -------
-    features: List (List (float))
+    List (List (Integer))
+        List of sEMG windows
     """
     #Opens a .txt file
     file = open(fileAddress,"r")
@@ -50,9 +51,23 @@ def dataset(fileAddress):
             for i in range(len(string_arr)):
                 data[current_window+i][channel] = int(string_arr[i])
             channel = channel + 1
-            
-    #Extract MAV for 8 sample window
-    windows = [data[i:i + 8] for i in range(0, len(data), 8)]
+    
+    return [data[i:i + 8] for i in range(0, len(data), 8)]
+
+def extractFeatures(windows):
+    """
+    Extracts features for each channel
+
+    Parameters
+    ----------
+    windows: List (List (Integer))
+        List of sEMG windows
+
+    Returns
+    -------
+    features: List (List (float))
+    """
+    #Extract MAV for 8 sample window    
     features = [[0.0 for i in range(8)] for j in range(len(windows))]
     for i in range(len(windows)):
         numsum = [0] * len(windows[i])
