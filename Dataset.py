@@ -21,7 +21,8 @@ label = [None] * 8
 # Constants
 num_channels = 8
 num_gestures = 8
-win_length = 8
+win_length = 10
+win_increment = win_length
 
 # For K-Fold Cross-Validation
 num_folds = 8
@@ -30,7 +31,7 @@ if __name__ == "__main__":
     #Fetch EMG Feature data for each gesture
     for gesture in range(num_gestures):
         # Extract raw EMG data
-        data[gesture] = dataset("Dataset/HandGesture0" + str(gesture+1) + ".txt")
+        data[gesture] = dataset("Dataset/HandGesture0" + str(gesture+1) + ".txt", win_length, win_increment)
         # Extract MAV from raw data
         #data[gesture] = extractFeatures(data[gesture])
         label[gesture] = [gesture for i in range(len(data[gesture]))]
@@ -89,5 +90,5 @@ if __name__ == "__main__":
         total_loss += loss
         
     # Print overall evaluation results
-    print("Final loss: ", total_loss/8,"\nFinal accuracy: ", total_acc/8)
+    print("Final loss: ", total_loss/num_folds,"\nFinal accuracy: ", total_acc/num_folds)
     print("Time taken to train Net: "+str(time.time()-init_time)+" seconds\n")
