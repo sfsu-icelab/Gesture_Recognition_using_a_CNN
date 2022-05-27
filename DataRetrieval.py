@@ -8,7 +8,7 @@ Program containing methods for retrieving data from dataset
 
 """
 
-def dataset(fileAddress):
+def dataset(fileAddress, window_length, sliding_increment=1):
     """
     Scans a .txt file for sEMG data
 
@@ -17,6 +17,11 @@ def dataset(fileAddress):
     fileAddress: String
         The location of the file to be read on the file explorer
         Must end with '.txt'
+    window_length: Integer
+        Number of samples in each Window
+    sliding_increment: Integer
+        Number of time units the window should shift forward
+        Defaults to 1
 
     Returns
     -------
@@ -52,7 +57,7 @@ def dataset(fileAddress):
                 data[current_window+i][channel] = int(string_arr[i])
             channel = channel + 1
     
-    return [data[i:i + 8] for i in range(0, len(data), 8)]
+    return [data[i:i + window_length] for i in range(0, len(data), sliding_increment)]
 
 def extractFeatures(windows):
     """
