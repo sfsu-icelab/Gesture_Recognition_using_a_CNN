@@ -11,7 +11,7 @@ Program containing methods for interacting with the Neural Network
 import tensorflow as tf 
 import numpy as np
 
-def trainData(model, train_data, train_label, num_classes, num_features=0):
+def trainData(model, train_data, train_label, num_classes, num_channels, window_length=0, num_features=0):
     """
     Trains an empty model
 
@@ -25,8 +25,14 @@ def trainData(model, train_data, train_label, num_classes, num_features=0):
         Labels used to supervise training of the model
     num_classes: Integer
         The number of possible outcomes for classification
+    num_channels : Integer
+        The number of channels received from the EMG device
+    window_length (Optional) : Integer
+        Number of samples in each Window
+        Used for 2D Network only
     num_features (Optional) : Integer
         The total number of features that will go into the network.
+        Used for 1D Network only
 
     Returns
     -------
@@ -34,12 +40,13 @@ def trainData(model, train_data, train_label, num_classes, num_features=0):
         The trained Neural Network model
 
     """
+    
     #Next Layers will utilize relu to activate the neuron
     if num_features == 0:
         # 2D layer containing 8 neural units
-        model.add(tf.keras.layers.Conv2D(8, kernel_size=(3, 3), activation='relu', input_shape=(8,8,1)))
+        model.add(tf.keras.layers.Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(window_length,num_channels,1)))
     else:
-        model.add(tf.keras.layers.Conv1D(8, kernel_size=3, activation=tf.nn.relu,padding='same'))
+        model.add(tf.keras.layers.Conv1D(num_channels, kernel_size=3, activation=tf.nn.relu,padding='same'))
     
     #model.add(tf.keras.layer.MaxPooling2D(pool_size=(2, 2)))
     # Flatten output for final layer
