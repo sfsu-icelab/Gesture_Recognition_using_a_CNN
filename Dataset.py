@@ -14,12 +14,21 @@ import tensorflow as tf
 import time
 from CNN import trainData, testData
 
+# Instantiate Dataset
 data = [None] * 8
 label = [None] * 8
 
+# Constants
+num_channels = 8
+num_gestures = 8
+win_length = 8
+
+# For K-Fold Cross-Validation
+num_folds = 8
+
 if __name__ == "__main__":
     #Fetch EMG Feature data for each gesture
-    for gesture in range(8):
+    for gesture in range(num_gestures):
         # Extract raw EMG data
         data[gesture] = dataset("Dataset/HandGesture0" + str(gesture+1) + ".txt")
         # Extract MAV from raw data
@@ -34,10 +43,10 @@ if __name__ == "__main__":
     total_loss = 0
     
     # Size of each fold for K-Fold cross validation
-    divisor = int(len(data[1]) / 8)
+    divisor = int(len(data[1]) / num_folds)
     
     # Train and test a model for each of 8 folds
-    for i in range(8):
+    for i in range(num_folds):
         
         # Instatitate empty lists for current fold
         x_train = []
@@ -49,7 +58,7 @@ if __name__ == "__main__":
         test_start = i*divisor
         test_end = (i+1)*divisor
         
-        for gesture in range(8):
+        for gesture in range(num_gestures):
             # All folds before current fold used for training
             x_train += data[gesture][0:test_start]
             y_train += label[gesture][0:test_start]
@@ -67,7 +76,7 @@ if __name__ == "__main__":
         model = tf.keras.models.Sequential()
         
         # Train model using raw sEMG image
-        model = trainData(model, x_train, y_train, 8)
+        model = trainData(model, x_train, y_train, num_gestures, num_channels, window_length=win_length)
         # Evaluate current model and update overall evaluation with results
         loss, acc = testData(model, x_test, y_test)
         
