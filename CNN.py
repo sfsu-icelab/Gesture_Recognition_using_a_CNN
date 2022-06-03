@@ -11,6 +11,54 @@ Program containing methods for interacting with the Neural Network
 import tensorflow as tf 
 import numpy as np
 
+def trainDataSpatial(model, train_data, train_label, num_classes, rows, cols):
+    """
+    Trains an empty model using raw sEMG Images
+
+    Parameters
+    ----------
+    model : Sequential Object
+        The model to be trained
+    train_data : Array
+        Data used to train model
+    train_label : Array
+        Labels used to supervise training of the model
+    num_classes: Integer
+        The number of possible outcomes for classification
+    rows: Integer
+        Number of rows in the sEMG Array
+    cols: Integer
+        Number of columns in the sEMG Array
+
+    Returns
+    -------
+    model
+        The trained Neural Network model
+
+    """
+    
+    #Next Layers will utilize relu to activate the neuron
+    model.add(tf.keras.layers.Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(rows,cols,1)))
+    
+    # Flatten output for final layer
+    model.add(tf.keras.layers.Flatten())
+    #Final Layer produces 4 possible outputs representing each gesture
+    #Softmax Function assigns each output a probability so all outputs sum to 1
+    model.add(tf.keras.layers.Dense(num_classes,activation=tf.nn.softmax))
+    
+    #Compile Neural Net with a learning rate of 0.01
+    model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.01),
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy']
+                  )
+    
+    train_label = np.array(train_label)
+    train_data = np.array(train_data)
+    #Train Neural Net through 1 epoch
+    model.fit(train_data,train_label,epochs=1)
+    
+    return model
+
 def trainData(model, train_data, train_label, num_classes, num_channels, window_length=0, num_features=0):
     """
     Trains an empty model
