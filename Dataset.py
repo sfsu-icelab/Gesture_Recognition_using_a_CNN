@@ -9,33 +9,36 @@ Main Program for Offline system which reads data, trains CNN model,
 
 """
 
-from DataRetrieval import dataset, extractFeatures
+from DataRetrieval import dataset, dataset_mat, extractFeatures
 import tensorflow as tf
 import time
-from CNN import trainData, testData
-
-# Instantiate Dataset
-data = [None] * 8
-label = [None] * 8
+from CNN import trainData, trainDataSpatial, testData
 
 # Constants
 num_channels = 8
-num_gestures = 8
+num_gestures = 7
 win_length = 10
 win_increment = win_length
+
+rows = 8
+columns = 24
 
 # For K-Fold Cross-Validation
 num_folds = 8
 
+# Instantiate Dataset
+data = [None] * num_gestures
+label = [None] * num_gestures
+
 if __name__ == "__main__":
     #Fetch EMG Feature data for each gesture
     for gesture in range(num_gestures):
-        # Extract raw EMG data
-        data[gesture] = dataset("Dataset/HandGesture0" + str(gesture+1) + ".txt", win_length, win_increment)
+        # Extract raw EMG data images
+        data[gesture] = dataset_mat("HD_Dataset/001-00" + str(gesture+1) + "-001.mat", rows, columns)
         # Extract MAV from raw data
         #data[gesture] = extractFeatures(data[gesture])
         label[gesture] = [gesture for i in range(len(data[gesture]))]
-    
+    #print(data[0])
     # Start computation timing
     init_time = time.time()
     
@@ -48,7 +51,6 @@ if __name__ == "__main__":
     
     # Train and test a model for each of 8 folds
     for i in range(num_folds):
-        
         # Instatitate empty lists for current fold
         x_train = []
         y_train = []
@@ -77,14 +79,19 @@ if __name__ == "__main__":
         model = tf.keras.models.Sequential()
         
         # Train model using raw sEMG image
-        model = trainData(model, x_train, y_train, num_gestures, num_channels, window_length=win_length)
+        #model = trainData(model, x_train, y_train, num_gestures, num_channels, window_length=win_length)
         # Evaluate current model and update overall evaluation with results
-        loss, acc = testData(model, x_test, y_test)
+        #loss, acc = testData(model, x_test, y_test)
         
         # Train model using features
-        #model = trainData(model, x_train, y_train, 8, 8)
+        #model = trainData(model, x_train, y_train, num_gestures, num_channels, window_length=win_length, num_features=8)
         # Evaluate current model and update overall evaluation with results
         #loss, acc = testData(model, x_test, y_test, 8)
+        
+        # Train model using raw sEMG image
+        model = trainDataSpatial(model, x_train, y_train, num_gestures, rows, columns)
+        # Evaluate current model and update overall evaluation with results
+        loss, acc = testData(model, x_test, y_test)
         
         total_acc += acc
         total_loss += loss
