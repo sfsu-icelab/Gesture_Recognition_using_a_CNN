@@ -8,6 +8,46 @@ Program containing methods for retrieving data from dataset
 
 """
 
+def dataset_mat(fileAddress, rows, cols):
+    """
+    Scans a .mat file for sEMG data
+
+    Parameters
+    ----------
+    fileAddress: String
+        The location of the file to be read on the file explorer
+        Must end with '.txt'
+    rows: Integer
+        Number of rows in the sEMG Array
+    cols: Integer
+        Number of columns in the sEMG Array
+    
+
+    Returns
+    -------
+    data: List (List (List (Integer)))
+        List of sEMG images
+    """
+    
+    import scipy.io
+    
+    # Read .mat file into Dictionary object and extract list of data
+    mat = scipy.io.loadmat(fileAddress)['Data'][0:1000]
+    
+    # Instantiate empty dataset
+    data = [[[0] * cols] * rows] * len(mat)
+    
+    # Iterate through samples
+    for i in range(len(mat)):
+        # Iterate through rows for each sample
+        for j in range(rows):
+            # Iterate through columns for each row
+            for k in range(cols):
+                # Save current sample to dataset
+                data[i][j][k] = mat[i][j*cols+k]
+    return data
+    
+
 def dataset(fileAddress, window_length, sliding_increment=1):
     """
     Scans a .txt file for sEMG data
@@ -57,7 +97,7 @@ def dataset(fileAddress, window_length, sliding_increment=1):
                 data[current_window+i][channel] = int(string_arr[i])
             channel = channel + 1
     
-    return [data[i:i + window_length] for i in range(0, len(data), sliding_increment)]
+    return [data[i:i + window_length] for i in range(0, len(data)-100, sliding_increment)]
 
 def extractFeatures(windows):
     """
