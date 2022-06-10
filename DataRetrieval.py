@@ -8,7 +8,46 @@ Program containing methods for retrieving data from dataset
 
 """
 
-def dataset_mat(fileAddress, rows, cols):
+def dataset_mat_CSL(fileAddress, rows, cols):
+    """
+    Scans a .mat file for sEMG data
+
+    Parameters
+    ----------
+    fileAddress: String
+        The location of the file to be read on the file explorer
+        Must end with '.txt'
+    rows: Integer
+        Number of rows in the sEMG Array
+    cols: Integer
+        Number of columns in the sEMG Array
+    
+
+    Returns
+    -------
+    data: List (List (List (Integer)))
+        List of sEMG images
+    """
+    
+    import scipy.io
+    
+    # Read .mat file into Dictionary object and extract list of data
+    mat = scipy.io.loadmat(fileAddress)['gestures'][0][0]
+    # Instantiate empty dataset
+    data = [[[0 for col in range(cols)]for row in range(rows)] for samp in range(len(mat[0]))]
+    #data = [[[0] * cols] * rows] * len(mat[0])
+    
+    # Iterate through samples
+    for i in range(len(mat[0])):
+        # Iterate through rows for each sample
+        for j in range(rows):
+            # Iterate through columns for each row
+            for k in range(cols):
+                # Save current sample to dataset
+                data[i][j][k] = mat[j*cols+k][i]
+    return data
+
+def dataset_mat_ICE(fileAddress, rows, cols):
     """
     Scans a .mat file for sEMG data
 
@@ -35,8 +74,8 @@ def dataset_mat(fileAddress, rows, cols):
     mat = scipy.io.loadmat(fileAddress)['Data'][0:1000]
     
     # Instantiate empty dataset
-    data = [[[0] * cols] * rows] * len(mat)
-    
+    #data = [[[0] * cols] * rows] * len(mat)
+    data = [[[0 for col in range(cols)]for row in range(rows)] for samp in range(len(mat))]
     # Iterate through samples
     for i in range(len(mat)):
         # Iterate through rows for each sample
@@ -45,6 +84,7 @@ def dataset_mat(fileAddress, rows, cols):
             for k in range(cols):
                 # Save current sample to dataset
                 data[i][j][k] = mat[i][j*cols+k]
+    
     return data
     
 
