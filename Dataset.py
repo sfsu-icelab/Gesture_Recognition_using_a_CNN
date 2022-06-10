@@ -9,14 +9,14 @@ Main Program for Offline system which reads data, trains CNN model,
 
 """
 
-from DataRetrieval import dataset, dataset_mat, extractFeatures
+from DataRetrieval import dataset, dataset_mat_CSL, dataset_mat_ICE, extractFeatures
 import tensorflow as tf
 import time
 from CNN import trainData, trainDataSpatial, testData
 
 # Constants
 num_channels = 8
-num_gestures = 7
+num_gestures = 8
 win_length = 10
 win_increment = win_length
 
@@ -27,18 +27,19 @@ columns = 24
 num_folds = 8
 
 # Instantiate Dataset
-data = [None] * num_gestures
-label = [None] * num_gestures
+data = [None for sample in range(num_gestures)]
+label = [None for sample in range(num_gestures)]
 
 if __name__ == "__main__":
     #Fetch EMG Feature data for each gesture
     for gesture in range(num_gestures):
         # Extract raw EMG data images
-        data[gesture] = dataset_mat("HD_Dataset/001-00" + str(gesture+1) + "-001.mat", rows, columns)
+        #data[gesture] = dataset_mat_CSL("CSL_HDEMG_Subject1_Session1/gest" + str(gesture+1) + ".mat", rows, columns)
+        data[gesture] = dataset_mat_ICE("ICE_Lab_Database/1.20.21_Database/Training_Trimmed/001-00" + str(gesture+1) + "-001.mat", rows, columns)
         # Extract MAV from raw data
         #data[gesture] = extractFeatures(data[gesture])
         label[gesture] = [gesture for i in range(len(data[gesture]))]
-    #print(data[0])
+    #print(data[0][0])
     # Start computation timing
     init_time = time.time()
     
@@ -47,7 +48,7 @@ if __name__ == "__main__":
     total_loss = 0
     
     # Size of each fold for K-Fold cross validation
-    divisor = int(len(data[1]) / num_folds)
+    divisor = int(len(data[0]) / num_folds)
     
     # Train and test a model for each of 8 folds
     for i in range(num_folds):
@@ -87,7 +88,7 @@ if __name__ == "__main__":
         #model = trainData(model, x_train, y_train, num_gestures, num_channels, window_length=win_length, num_features=8)
         # Evaluate current model and update overall evaluation with results
         #loss, acc = testData(model, x_test, y_test, 8)
-        
+        #print(x_train[0])
         # Train model using raw sEMG image
         model = trainDataSpatial(model, x_train, y_train, num_gestures, rows, columns)
         # Evaluate current model and update overall evaluation with results
