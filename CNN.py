@@ -37,11 +37,24 @@ def trainDataSpatial(model, train_data, train_label, num_classes, rows, cols):
 
     """
     
-    #Next Layers will utilize relu to activate the neuron
-    model.add(tf.keras.layers.Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(rows,cols,1)))
+    #Next Layers will utilize relu to activate the neural unit
+    
+    # Two Conv. Layers with 64 filters of 3x3 kernals
+    model.add(tf.keras.layers.Conv2D(64, kernel_size=(3, 3), activation='relu', padding='same', input_shape=(rows,cols,1)))
+    model.add(tf.keras.layers.Conv2D(64, kernel_size=(3, 3), activation='relu', input_shape=(rows,cols,1)))
+    
+    # Two Locally Connected Layers with 64 non-overlapping filters of 1x1 kernals
+    model.add(tf.keras.layers.LocallyConnected2D(64, kernel_size=(1, 1), activation='relu', input_shape=(rows,cols,1)))
+    model.add(tf.keras.layers.LocallyConnected2D(64, kernel_size=(1, 1), activation='relu', input_shape=(rows,cols,1)))
+    
+    # Three Fully Connected Layers with 512,512,and 128 units
+    model.add(tf.keras.layers.Dense(512, activation='relu'))
+    model.add(tf.keras.layers.Dense(512, activation='relu'))
+    model.add(tf.keras.layers.Dense(128, activation='relu'))
     
     # Flatten output for final layer
     model.add(tf.keras.layers.Flatten())
+    
     #Final Layer produces 4 possible outputs representing each gesture
     #Softmax Function assigns each output a probability so all outputs sum to 1
     model.add(tf.keras.layers.Dense(num_classes,activation=tf.nn.softmax))
@@ -92,7 +105,7 @@ def trainData(model, train_data, train_label, num_classes, num_channels, window_
     #Next Layers will utilize relu to activate the neuron
     if num_features == 0:
         # 2D layer containing 8 neural units
-        model.add(tf.keras.layers.Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(window_length,num_channels,1)))
+        model.add(tf.keras.layers.Conv2D(64, kernel_size=(3, 3), activation='relu', input_shape=(window_length,num_channels,1)))
     else:
         model.add(tf.keras.layers.Conv1D(num_channels, kernel_size=3, activation=tf.nn.relu,padding='same'))
     
@@ -104,7 +117,7 @@ def trainData(model, train_data, train_label, num_classes, num_channels, window_
     model.add(tf.keras.layers.Dense(num_classes,activation=tf.nn.softmax))
     
     #Compile Neural Net with a learning rate of 0.01
-    model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.01),
+    model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.1),
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy']
                   )
