@@ -33,12 +33,12 @@ def dataset_mat_CSL(fileAddress, rows, cols):
     
     # Read .mat file into Dictionary object and extract list of data
     mat = scipy.io.loadmat(fileAddress)['gestures'][0][0]
-    # Instantiate empty dataset
-    data = [[[0 for col in range(cols)]for row in range(rows)] for samp in range(len(mat[0]))]
-    #data = [[[0] * cols] * rows] * len(mat[0])
     
+    # Instantiate empty dataset
+    data = [[[0 for col in range(cols)]for row in range(rows)] for samp in range(1000)]
+    #data = [[[0] * cols] * rows] * len(mat[0])
     # Iterate through samples
-    for i in range(len(mat[0])):
+    for i in range(1000):
         # Iterate through rows for each sample
         for j in range(rows):
             # Iterate through columns for each row
