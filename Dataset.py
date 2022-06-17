@@ -34,12 +34,12 @@ if __name__ == "__main__":
     #Fetch EMG Feature data for each gesture
     for gesture in range(num_gestures):
         # Extract raw EMG data images
-        #data[gesture] = dataset_mat_CSL("CSL_HDEMG_Subject1_Session1/gest" + str(gesture+1) + ".mat", rows, columns)
-        data[gesture] = dataset_mat_ICE("ICE_Lab_Database/1.20.21_Database/Training_Trimmed/001-00" + str(gesture+1) + "-001.mat", rows, columns)
+        data[gesture] = dataset_mat_CSL("CSL_HDEMG_Subject1_Session1/gest" + str(gesture+1) + ".mat", rows, columns)
+        #data[gesture] = dataset_mat_ICE("ICE_Lab_Database/1.20.21_Database/Training_Trimmed/001-00" + str(gesture+1) + "-001.mat", rows, columns)
         # Extract MAV from raw data
         #data[gesture] = extractFeatures(data[gesture])
         label[gesture] = [gesture for i in range(len(data[gesture]))]
-    #print(data[0][0])
+        
     # Start computation timing
     init_time = time.time()
     
