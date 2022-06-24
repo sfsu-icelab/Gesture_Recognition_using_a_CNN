@@ -11,8 +11,11 @@ Main Program for Offline system which reads data, trains CNN model,
 
 from DataRetrieval import dataset, dataset_mat_CSL, dataset_mat_ICE, extractFeatures
 import tensorflow as tf
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import time
+import numpy as np
 from CNN import trainData, trainDataSpatial, testData
+from LDA import trainDataLDA
 
 # Constants
 num_channels = 8
@@ -90,12 +93,19 @@ if __name__ == "__main__":
         #loss, acc = testData(model, x_test, y_test, 8)
         #print(x_train[0])
         # Train model using raw sEMG image
-        model = trainDataSpatial(model, x_train, y_train, num_gestures, rows, columns)
+        #model = trainDataSpatial(model, x_train, y_train, num_gestures, rows, columns)
         # Evaluate current model and update overall evaluation with results
-        loss, acc = testData(model, x_test, y_test, num_rows=rows, num_cols=columns)
+        #loss, acc = testData(model, x_test, y_test, num_rows=rows, num_cols=columns)
+        
+        x_train = np.array(x_train).reshape(-1, rows*columns)
+        x_test = np.array(x_test).reshape(-1, rows*columns)
+        model = LinearDiscriminantAnalysis()
+        model.fit_transform(x_train, y_train)
+        acc = model.score(x_test, y_test)
+        print(acc)
         
         total_acc += acc
-        total_loss += loss
+        #total_loss += loss
         
     # Print overall evaluation results
     print("Final loss: ", total_loss/num_folds,"\nFinal accuracy: ", total_acc/num_folds)

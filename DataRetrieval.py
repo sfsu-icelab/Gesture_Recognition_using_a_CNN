@@ -155,7 +155,31 @@ def extractFeatures(windows):
     #Extract MAV for 8 sample window    
     features = [[0.0 for i in range(8)] for j in range(len(windows))]
     for i in range(len(windows)):
-        numsum = [0] * len(windows[i])
+        numsum = [0 for samp in range(len(windows[i]))]
+        for sample in windows[i]:
+            for channel in range(len(sample)):
+                numsum[channel] += abs(sample[channel])
+        for channel in range(8):
+            features[i][channel] = numsum[channel]/len(windows[i])
+    return features
+
+def extractFeaturesHD(windows, rows, cols):
+    """
+    Extracts features for each channel
+
+    Parameters
+    ----------
+    windows: List (List (Integer))
+        List of sEMG windows
+
+    Returns
+    -------
+    features: List (List (float))
+    """
+    #Extract MAV for 8 sample window    
+    features = [[0.0 for i in range(8)] for j in range(len(windows))]
+    for i in range(len(windows)):
+        numsum = [0 for samp in range(len(windows[i]))]
         for sample in windows[i]:
             for channel in range(len(sample)):
                 numsum[channel] += abs(sample[channel])
