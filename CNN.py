@@ -40,17 +40,18 @@ def trainDataSpatial(model, train_data, train_label, num_classes, rows, cols):
     #Next Layers will utilize relu to activate the neural unit
     
     # Two Conv. Layers with 64 filters of 3x3 kernals
+    train_data = np.array(train_data).reshape(-1, rows, cols, 1)
     model.add(tf.keras.layers.Conv2D(64, kernel_size=(3, 3), activation='relu', padding='same', input_shape=(rows,cols,1)))
-    model.add(tf.keras.layers.Conv2D(64, kernel_size=(3, 3), activation='relu', input_shape=(rows,cols,1)))
+    #model.add(tf.keras.layers.Conv2D(64, kernel_size=(3, 3), activation='relu', input_shape=(rows,cols,1)))
     
     # Two Locally Connected Layers with 64 non-overlapping filters of 1x1 kernals
-    model.add(tf.keras.layers.LocallyConnected2D(64, kernel_size=(1, 1), activation='relu', input_shape=(rows,cols,1)))
-    model.add(tf.keras.layers.LocallyConnected2D(64, kernel_size=(1, 1), activation='relu', input_shape=(rows,cols,1)))
+    #model.add(tf.keras.layers.LocallyConnected2D(64, kernel_size=(1, 1), activation='relu', input_shape=(rows,cols,1)))
+    #model.add(tf.keras.layers.LocallyConnected2D(64, kernel_size=(1, 1), activation='relu', input_shape=(rows,cols,1)))
     
     # Three Fully Connected Layers with 512,512,and 128 units
-    model.add(tf.keras.layers.Dense(512, activation='relu'))
-    model.add(tf.keras.layers.Dense(512, activation='relu'))
-    model.add(tf.keras.layers.Dense(128, activation='relu'))
+    #model.add(tf.keras.layers.Dense(512, activation='relu'))
+    #model.add(tf.keras.layers.Dense(512, activation='relu'))
+    #model.add(tf.keras.layers.Dense(128, activation='relu'))
     
     # Flatten output for final layer
     model.add(tf.keras.layers.Flatten())
@@ -132,7 +133,7 @@ def trainData(model, train_data, train_label, num_classes, num_channels, window_
     
     return model
 
-def testData(model, test_data, test_label, num_features=0):
+def testData(model, test_data, test_label, num_features=0, num_rows=1, num_cols=1):
     """
     Evaluates a trained model
 
@@ -158,7 +159,7 @@ def testData(model, test_data, test_label, num_features=0):
     """
     test_label = np.array(test_label)
     if num_features == 0:
-        test_data = np.array(test_data)
+        test_data = np.array(test_data).reshape(-1, num_rows, num_cols, 1)
     else:
         test_data = np.array(test_data).reshape(-1, num_features, 1)
     loss, accuracy = model.evaluate(test_data,test_label)
