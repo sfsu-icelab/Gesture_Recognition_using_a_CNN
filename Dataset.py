@@ -9,13 +9,12 @@ Main Program for Offline system which reads data, trains CNN model,
 
 """
 
-from DataRetrieval import dataset, dataset_mat_CSL, dataset_mat_ICE, extractFeatures
+from DataRetrieval import dataset, dataset_mat_CSL, dataset_mat_ICE, extractFeatures, extractFeaturesHD
 import tensorflow as tf
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import time
 import numpy as np
 from CNN import trainData, trainDataSpatial, testData
-from LDA import trainDataLDA
 
 # Constants
 num_channels = 8
@@ -37,10 +36,11 @@ if __name__ == "__main__":
     #Fetch EMG Feature data for each gesture
     for gesture in range(num_gestures):
         # Extract raw EMG data images
-        #data[gesture] = dataset_mat_CSL("CSL_HDEMG_Subject1_Session1/gest" + str(gesture+1) + ".mat", rows, columns)
-        data[gesture] = dataset_mat_ICE("ICE_Lab_Database/1.20.21_Database/Training_Trimmed/001-00" + str(gesture+1) + "-001.mat", rows, columns)
+        data[gesture] = dataset_mat_CSL("CSL_HDEMG_Subject1_Session1/gest" + str(gesture+1) + ".mat", rows, columns)
+        #data[gesture] = dataset_mat_ICE("ICE_Lab_Database/1.20.21_Database/Training_Trimmed/001-00" + str(gesture+1) + "-001.mat", rows, columns)
         # Extract MAV from raw data
         #data[gesture] = extractFeatures(data[gesture])
+        #data[gesture] = extractFeaturesHD(data[gesture], rows, columns)
         label[gesture] = [gesture for i in range(len(data[gesture]))]
         
     # Start computation timing
@@ -80,7 +80,7 @@ if __name__ == "__main__":
         
         #Creates a new Sequential Neural Net for this fold.
         #"Sequential" refers to the fact that neural layers are stacked in sequence
-        model = tf.keras.models.Sequential()
+        #model = tf.keras.models.Sequential()
         
         # Train model using raw sEMG image
         #model = trainData(model, x_train, y_train, num_gestures, num_channels, window_length=win_length)

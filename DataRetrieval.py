@@ -176,13 +176,12 @@ def extractFeaturesHD(windows, rows, cols):
     -------
     features: List (List (float))
     """
-    #Extract MAV for 8 sample window    
-    features = [[0.0 for i in range(8)] for j in range(len(windows))]
+    #Extract MAV
+    features = [0.0 for i in range(len(windows))]
     for i in range(len(windows)):
-        numsum = [0 for samp in range(len(windows[i]))]
-        for sample in windows[i]:
-            for channel in range(len(sample)):
-                numsum[channel] += abs(sample[channel])
-        for channel in range(8):
-            features[i][channel] = numsum[channel]/len(windows[i])
+        numsum = 0
+        for j in range(rows):
+            for k in range(cols):
+                numsum += abs(windows[i][j][k])
+        features[i] = numsum/len(windows[i])
     return features
