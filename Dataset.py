@@ -18,11 +18,11 @@ from CNN import trainData, trainDataSpatial, testData
 
 # Constants
 num_channels = 8
-num_gestures = 8
+num_gestures = 26
 win_length = 10
 win_increment = win_length
 
-rows = 8
+rows = 7
 columns = 24
 
 # For K-Fold Cross-Validation
@@ -36,8 +36,8 @@ if __name__ == "__main__":
     #Fetch EMG Feature data for each gesture
     for gesture in range(num_gestures):
         # Extract raw EMG data images
-        #data[gesture] = dataset_mat_CSL("CSL_HDEMG_Subject1_Session1/gest" + str(gesture+1) + ".mat", rows, columns)
-        data[gesture] = dataset_mat_ICE("ICE_Lab_Database/1.20.21_Database/Training_Trimmed/001-00" + str(gesture+1) + "-001.mat", rows, columns)
+        data[gesture] = dataset_mat_CSL("CSL_HDEMG_Subject1_Session1/gest" + str(gesture+1) + ".mat", rows, columns)
+        #data[gesture] = dataset_mat_ICE("ICE_Lab_Database/1.20.21_Database/Training_Trimmed/001-00" + str(gesture+1) + "-001.mat", rows, columns)
         # Extract MAV from raw data
         #data[gesture] = extractFeatures(data[gesture])
         data[gesture] = extractFeaturesHD(data[gesture], rows, columns, win_length, win_increment)
@@ -99,7 +99,6 @@ if __name__ == "__main__":
         
         x_train = np.array(x_train).reshape(-1, rows*columns)
         x_test = np.array(x_test).reshape(-1, rows*columns)
-        
         model = LinearDiscriminantAnalysis()
         model.fit_transform(x_train, y_train)
         acc = model.score(x_test, y_test)
@@ -109,5 +108,6 @@ if __name__ == "__main__":
         #total_loss += loss
         
     # Print overall evaluation results
-    print("Final loss: ", total_loss/num_folds,"\nFinal accuracy: ", total_acc/num_folds)
-    print("Time taken to train Net: "+str(time.time()-init_time)+" seconds\n")
+    #print("Final loss: ", total_loss/num_folds)
+    print("Final accuracy: ", total_acc/num_folds)
+    print("Time taken to train Model: "+str(time.time()-init_time)+" seconds\n")
