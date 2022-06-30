@@ -36,11 +36,11 @@ if __name__ == "__main__":
     #Fetch EMG Feature data for each gesture
     for gesture in range(num_gestures):
         # Extract raw EMG data images
-        data[gesture] = dataset_mat_CSL("CSL_HDEMG_Subject1_Session1/gest" + str(gesture+1) + ".mat", rows, columns)
-        #data[gesture] = dataset_mat_ICE("ICE_Lab_Database/1.20.21_Database/Training_Trimmed/001-00" + str(gesture+1) + "-001.mat", rows, columns)
+        #data[gesture] = dataset_mat_CSL("CSL_HDEMG_Subject1_Session1/gest" + str(gesture+1) + ".mat", rows, columns)
+        data[gesture] = dataset_mat_ICE("ICE_Lab_Database/1.20.21_Database/Training_Trimmed/001-00" + str(gesture+1) + "-001.mat", rows, columns)
         # Extract MAV from raw data
         #data[gesture] = extractFeatures(data[gesture])
-        #data[gesture] = extractFeaturesHD(data[gesture], rows, columns)
+        data[gesture] = extractFeaturesHD(data[gesture], rows, columns, win_length, win_increment)
         label[gesture] = [gesture for i in range(len(data[gesture]))]
         
     # Start computation timing
@@ -91,7 +91,7 @@ if __name__ == "__main__":
         #model = trainData(model, x_train, y_train, num_gestures, num_channels, window_length=win_length, num_features=8)
         # Evaluate current model and update overall evaluation with results
         #loss, acc = testData(model, x_test, y_test, 8)
-        #print(x_train[0])
+        
         # Train model using raw sEMG image
         #model = trainDataSpatial(model, x_train, y_train, num_gestures, rows, columns)
         # Evaluate current model and update overall evaluation with results
@@ -99,6 +99,7 @@ if __name__ == "__main__":
         
         x_train = np.array(x_train).reshape(-1, rows*columns)
         x_test = np.array(x_test).reshape(-1, rows*columns)
+        
         model = LinearDiscriminantAnalysis()
         model.fit_transform(x_train, y_train)
         acc = model.score(x_test, y_test)

@@ -37,6 +37,7 @@ def dataset_mat_CSL(fileAddress, rows, cols):
     # Instantiate empty dataset
     data = [[[0 for col in range(cols)]for row in range(rows)] for samp in range(1000)]
     #data = [[[0] * cols] * rows] * len(mat[0])
+    
     # Iterate through samples
     for i in range(1000):
         # Iterate through rows for each sample
@@ -163,7 +164,7 @@ def extractFeatures(windows):
             features[i][channel] = numsum[channel]/len(windows[i])
     return features
 
-def extractFeaturesHD(windows, rows, cols):
+def extractFeaturesHD(data, rows, cols, window_length, sliding_increment):
     """
     Extracts features for each channel
 
@@ -176,12 +177,19 @@ def extractFeaturesHD(windows, rows, cols):
     -------
     features: List (List (float))
     """
+    windows = [data[i:i + window_length] for i in range(0, len(data), sliding_increment)]
+    
     #Extract MAV
-    features = [0.0 for i in range(len(windows))]
-    for i in range(len(windows)):
-        numsum = 0
-        for j in range(rows):
-            for k in range(cols):
-                numsum += abs(windows[i][j][k])
-        features[i] = numsum/len(windows[i])
+    features = [[[0.0 for i in range(cols)] for j in range(rows)] for k in range(len(windows))]
+    for window in range(len(windows)):
+        numsum = [[0 for samp in range(cols)] for row in range(rows)]
+        for sample in range(window_length):
+            for row in range(rows):
+                for col in range(cols):
+                    numsum[row][col] += abs(windows[window][sample][row][col])
+                    
+        for row in range(rows):
+            for col in range(cols):
+                features[window][row][col] = numsum[row][col]/len(windows[window])
+                
     return features
