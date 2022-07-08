@@ -19,7 +19,7 @@ from CNN import trainData, trainDataSpatial, testData
 # Constants
 num_channels = 8
 num_gestures = 26
-win_length = 10
+win_length = 200
 win_increment = win_length
 
 rows = 7

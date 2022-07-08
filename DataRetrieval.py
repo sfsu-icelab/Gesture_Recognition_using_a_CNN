@@ -33,13 +33,12 @@ def dataset_mat_CSL(fileAddress, rows, cols):
     
     # Read .mat file into Dictionary object and extract list of data
     mat = scipy.io.loadmat(fileAddress)['gestures'][0][0]
-    
     # Instantiate empty dataset
-    data = [[[0 for col in range(cols)]for row in range(rows)] for samp in range(1000)]
+    data = [[[0 for col in range(cols)]for row in range(rows)] for samp in range(len(mat[0]))]
     #data = [[[0] * cols] * rows] * len(mat[0])
     
     # Iterate through samples
-    for i in range(1000):
+    for i in range(len(data)):
         # Iterate through rows for each sample
         for j in range(rows):
             # Iterate through columns for each row
@@ -72,7 +71,7 @@ def dataset_mat_ICE(fileAddress, rows, cols):
     import scipy.io
     
     # Read .mat file into Dictionary object and extract list of data
-    mat = scipy.io.loadmat(fileAddress)['Data'][0:1000]
+    mat = scipy.io.loadmat(fileAddress)['Data']
     
     # Instantiate empty dataset
     #data = [[[0] * cols] * rows] * len(mat)
@@ -177,10 +176,12 @@ def extractFeaturesHD(data, rows, cols, window_length, sliding_increment):
     -------
     features: List (List (float))
     """
-    windows = [data[i:i + window_length] for i in range(0, len(data), sliding_increment)]
+    data_length = len(data) - (len(data) % window_length)
+    windows = [data[i:i + window_length] for i in range(0, data_length, sliding_increment)]
     
     #Extract MAV
     features = [[[0.0 for i in range(cols)] for j in range(rows)] for k in range(len(windows))]
+
     for window in range(len(windows)):
         numsum = [[0 for samp in range(cols)] for row in range(rows)]
         for sample in range(window_length):
