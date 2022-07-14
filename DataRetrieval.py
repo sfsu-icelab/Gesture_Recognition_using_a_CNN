@@ -163,32 +163,55 @@ def extractFeatures(windows):
             features[i][channel] = numsum[channel]/len(windows[i])
     return features
 
-def extractFeaturesHD(data, rows, cols, window_length, sliding_increment):
+def extractFeaturesHD(data, rows, cols, window_length, sliding_increment=1):
     """
-    Extracts features for each channel
+    Extracts features for each channel in an HD Image
 
     Parameters
     ----------
-    windows: List (List (Integer))
-        List of sEMG windows
+    data: List (List (List (Integer)))
+        List of raw sEMG data samples for each channel in the image
+    rows: Integer
+        Number of rows in image
+    cols: Integer
+        Number of columns in image
+    window_length: Integer
+        Number of samples in each Window
+    sliding_increment: Integer
+        Number of time units the window should shift forward
+        Defaults to 1
 
     Returns
     -------
-    features: List (List (float))
+    features: List (List (List (float)))
+        List of extracted features for each channel in the image
     """
+    
+    # Determine length of data that can fit into complete windows
     data_length = len(data) - (len(data) % window_length)
+    
+    # Segment data into complete windows
     windows = [data[i:i + window_length] for i in range(0, data_length, sliding_increment)]
     
-    #Extract MAV
+    # Initialize empty list of features
     features = [[[0.0 for i in range(cols)] for j in range(rows)] for k in range(len(windows))]
 
+    # Loop through windows
     for window in range(len(windows)):
+        
+        # Initialize sum for a window
         numsum = [[0 for samp in range(cols)] for row in range(rows)]
+        
+        # Loop through samples in a window
         for sample in range(window_length):
+            # Loop through rows
             for row in range(rows):
+                # Loop through columns
                 for col in range(cols):
+                    # Add reading to corresponding sum for a single channel
                     numsum[row][col] += abs(windows[window][sample][row][col])
-                    
+        
+        # Extract MAV from sums for each window
         for row in range(rows):
             for col in range(cols):
                 features[window][row][col] = numsum[row][col]/len(windows[window])

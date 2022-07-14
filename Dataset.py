@@ -18,7 +18,7 @@ from CNN import trainData, trainDataSpatial, testData
 
 # Constants
 num_channels = 8
-num_gestures = 26
+num_gestures = 8
 win_length = 200
 win_increment = win_length
 
@@ -36,8 +36,8 @@ if __name__ == "__main__":
     #Fetch EMG Feature data for each gesture
     for gesture in range(num_gestures):
         # Extract raw EMG data images
-        data[gesture] = dataset_mat_CSL("CSL_HDEMG_Subject1_Session1/gest" + str(gesture+1) + ".mat", rows, columns)
-        #data[gesture] = dataset_mat_ICE("ICE_Lab_Database/1.20.21_Database/Training_Trimmed/001-00" + str(gesture+1) + "-001.mat", rows, columns)
+        #data[gesture] = dataset_mat_CSL("CSL_HDEMG_Subject1_Session1/gest" + str(gesture+1) + ".mat", rows, columns)
+        data[gesture] = dataset_mat_ICE("ICE_Lab_Database/1.20.21_Database/Training_Trimmed/001-00" + str(gesture+1) + "-001.mat", rows, columns)
         # Extract MAV from raw data
         #data[gesture] = extractFeatures(data[gesture])
         data[gesture] = extractFeaturesHD(data[gesture], rows, columns, win_length, win_increment)
@@ -97,10 +97,15 @@ if __name__ == "__main__":
         # Evaluate current model and update overall evaluation with results
         #loss, acc = testData(model, x_test, y_test, num_rows=rows, num_cols=columns)
         
+        # Train LDA model using features
+        # Reshape 3-D dataset into 2-D so it can be processed by LDA
         x_train = np.array(x_train).reshape(-1, rows*columns)
         x_test = np.array(x_test).reshape(-1, rows*columns)
+        # Declare LDA model
         model = LinearDiscriminantAnalysis()
+        # Fit training data to LDA model
         model.fit_transform(x_train, y_train)
+        # Evaluate accuracy of LDA model
         acc = model.score(x_test, y_test)
         print(acc)
         
